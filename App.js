@@ -1,20 +1,53 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-
+import React, { useState, useRef } from 'react';
+import { View, Text, TouchableOpacity, Image } from 'react-native';
+import styles from './styles';
 export default function App() {
+  const [numero, setNumero] = useState(0);
+  const [botao, setBotao] = useState('INICIAR');
+  const [ultimo, setUltimo] = useState(null);
+  const timerRef = useRef(null);
+  const vai = () => {
+    if (timerRef.current !== null) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+      setBotao('INICIAR');
+    } else {
+      timerRef.current = setInterval(() => {
+        setNumero((prevNumero) => prevNumero + 0.1);
+      }, 100);
+      setBotao('PARAR');
+    }
+  };
+  const limpar = () => {
+    if (timerRef.current !== null) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    setUltimo(numero);
+    setNumero(0);
+    setBotao('INICIAR');
+  };
   return (
     <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+        <Image
+          source={require('./src/cronometro.png')}
+          style={styles.cronometro}
+          resizeMode='contain'
+        />
+        <Text style={styles.timer}>{numero.toFixed(1)}</Text>
+        <View style={styles.btnArea}>
+          <TouchableOpacity style={styles.btn} onPress={vai}>
+            <Text style={styles.btnTexto}>{botao}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.btn} onPress={limpar}>
+            <Text style={styles.btnTexto}>ZERAR</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.areaUltima}>
+          <Text style={styles.textoCorrida}>
+            {ultimo > 0 ? 'Ultimo tempo: ' + ultimo.toFixed(2) + 's' : ''}
+          </Text>
+        </View>
+      </View>
   );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+};
